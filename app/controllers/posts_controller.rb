@@ -1,13 +1,13 @@
 class PostsController < ApplicationController
-  before_action :find_id, only: [:edit, :publish, :destroy, :update]
+  before_action :find_id, only: [:edit, :publish, :update]
   skip_before_action :authenticate_user!, only: [:index]
 
   def index
-    @posts = Post.all
-  end
-
-  def home
-    @posts = Post.all
+    if user_signed_in?
+      @posts = Post.all
+    else
+      @posts = Post.where(ispublished: true)
+    end
   end
 
   def show
@@ -44,6 +44,7 @@ class PostsController < ApplicationController
   end
 
   def destroy
+    @post = Post.find_by(params[:id])
     @post.destroy
     redirect_to root_path
   end
